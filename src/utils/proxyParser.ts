@@ -13,6 +13,10 @@ export const isUrlLink = (str: string): boolean => {
   return true;
 };
 
+// Helper: returns true if a string looks like a country name (only letters, spaces, hyphens, dots, commas)
+const isCountryName = (str: string): boolean =>
+  /^[A-Za-z]([A-Za-z\s\-.,'])*$/.test(str) && !/^\d/.test(str);
+
 export const parseSingleProxy = (inputStr: string): RawProxy | null => {
   try {
     const trimmed = inputStr.trim();
@@ -36,6 +40,25 @@ export const parseSingleProxy = (inputStr: string): RawProxy | null => {
       }
     }
 
+    // Pattern 4: host:port:CountryName  (e.g. 8.219.97.248:80:Singapore)
+    // 3 colon-separated segments where the 3rd looks like a country name
+    const hostPortCountryMatch = /^([a-zA-Z0-9.-]+):(\d{1,5}):([^:]+)$/.exec(trimmed);
+    if (hostPortCountryMatch) {
+      const host = hostPortCountryMatch[1];
+      const port = Number(hostPortCountryMatch[2]);
+      const countryHint = hostPortCountryMatch[3].trim();
+
+      if (port >= 1 && port <= 65535 && isCountryName(countryHint)) {
+        return {
+          host,
+          port,
+          auth: 'none',
+          type: isIP(host) ? 'v4' : 'url',
+          countryHint
+        };
+      }
+    }
+
     // Pattern 2: host:port:user:pass
     const hostPortAuthMatch = /^([a-zA-Z0-9.-]+):(\d{1,5}):([^:@\s]+):([^:@\s]+)$/.exec(trimmed);
     if (hostPortAuthMatch) {
@@ -50,6 +73,26 @@ export const parseSingleProxy = (inputStr: string): RawProxy | null => {
           port,
           auth: `${user}:${pass}`,
           type: isIP(host) ? 'v4' : 'url'
+        };
+      }
+    }
+
+    // Pattern 5: host:port:user:pass:CountryName  (e.g. 1.2.3.4:8080:user:pass:Singapore)
+    const hostPortAuthCountryMatch = /^([a-zA-Z0-9.-]+):(\d{1,5}):([^:@\s]+):([^:@\s]+):([^:]+)$/.exec(trimmed);
+    if (hostPortAuthCountryMatch) {
+      const host = hostPortAuthCountryMatch[1];
+      const port = Number(hostPortAuthCountryMatch[2]);
+      const user = hostPortAuthCountryMatch[3];
+      const pass = hostPortAuthCountryMatch[4];
+      const countryHint = hostPortAuthCountryMatch[5].trim();
+
+      if (port >= 1 && port <= 65535 && isCountryName(countryHint)) {
+        return {
+          host,
+          port,
+          auth: `${user}:${pass}`,
+          type: isIP(host) ? 'v4' : 'url',
+          countryHint
         };
       }
     }

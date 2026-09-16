@@ -65,3 +65,108 @@ export const lookupCountry = (ip: string | null): CountryInfo => {
 
   return { name, flag, code };
 };
+
+// Reverse map: lowercase country name -> ISO code (built from COUNTRY_NAME_MAP)
+const NAME_TO_CODE: Record<string, string> = Object.entries(COUNTRY_NAME_MAP).reduce(
+  (acc, [code, name]) => {
+    acc[name.toLowerCase()] = code;
+    return acc;
+  },
+  {} as Record<string, string>
+);
+
+// Additional common name aliases not covered by the primary map
+const NAME_ALIASES: Record<string, string> = {
+  'russia': 'RU',
+  'russian federation': 'RU',
+  'south korea': 'KR',
+  'korea': 'KR',
+  'usa': 'US',
+  'united states of america': 'US',
+  'uk': 'GB',
+  'britain': 'GB',
+  'great britain': 'GB',
+  'czechia': 'CZ',
+  'czech republic': 'CZ',
+  'viet nam': 'VN',
+  'vietnam': 'VN',
+  'uae': 'AE',
+  'emirates': 'AE',
+  'singapore': 'SG',
+  'indonesia': 'ID',
+  'peru': 'PE',
+  'mexico': 'MX',
+  'egypt': 'EG',
+  'chile': 'CL',
+  'argentina': 'AR',
+  'india': 'IN',
+  'china': 'CN',
+  'taiwan': 'TW',
+  'hong kong': 'HK',
+  'thailand': 'TH',
+  'malaysia': 'MY',
+  'philippines': 'PH',
+  'ukraine': 'UA',
+  'turkey': 'TR',
+  'romania': 'RO',
+  'poland': 'PL',
+  'sweden': 'SE',
+  'norway': 'NO',
+  'finland': 'FI',
+  'denmark': 'DK',
+  'netherlands': 'NL',
+  'belgium': 'BE',
+  'austria': 'AT',
+  'switzerland': 'CH',
+  'portugal': 'PT',
+  'spain': 'ES',
+  'italy': 'IT',
+  'france': 'FR',
+  'germany': 'DE',
+  'japan': 'JP',
+  'brazil': 'BR',
+  'australia': 'AU',
+  'canada': 'CA',
+  'israel': 'IL',
+  'south africa': 'ZA',
+  'new zealand': 'NZ',
+  'ireland': 'IE',
+  'greece': 'GR',
+  'bulgaria': 'BG',
+  'slovakia': 'SK',
+  'croatia': 'HR',
+  'serbia': 'RS',
+  'hungary': 'HU',
+  'colombia': 'CO',
+  'saudi arabia': 'SA',
+};
+
+/**
+ * Resolves a country name string (e.g. "Singapore", "Indonesia") to a CountryInfo object.
+ * Falls back to Unknown if the name cannot be matched.
+ */
+export const lookupCountryByName = (countryName: string): CountryInfo => {
+  if (!countryName) return { name: 'Unknown', flag: '🌐', code: 'ZZ' };
+
+  const key = countryName.trim().toLowerCase();
+
+  // Try exact match in reverse name map first
+  const code =
+    NAME_TO_CODE[key] ||
+    NAME_ALIASES[key] ||
+    // Try partial match as last resort
+    Object.keys(NAME_TO_CODE).find(n => n.startsWith(key)) && NAME_TO_CODE[Object.keys(NAME_TO_CODE).find(n => n.startsWith(key))!] ||
+    Object.keys(NAME_ALIASES).find(n => n.startsWith(key)) && NAME_ALIASES[Object.keys(NAME_ALIASES).find(n => n.startsWith(key))!] ||
+    null;
+
+  if (!code) {
+    // Return the hint name as-is with an unknown flag so it's still visible
+    return { name: countryName.trim(), flag: '🌐', code: 'ZZ' };
+  }
+
+  return {
+    name: COUNTRY_NAME_MAP[code] || countryName.trim(),
+    flag: getFlagEmoji(code),
+    code
+  };
+};

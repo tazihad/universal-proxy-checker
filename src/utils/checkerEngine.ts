@@ -9,7 +9,7 @@ import {
 } from '../types';
 import { JudgeManager } from './judgeManager';
 import { BlacklistManager } from './blacklistManager';
-import { lookupCountry } from './countryLookup';
+import { lookupCountry, lookupCountryByName } from './countryLookup';
 
 export interface CheckerCallbacks {
   onProgress: (stats: CheckingStats) => void;
@@ -215,7 +215,9 @@ export class CheckerEngine {
     }
 
     if (detectedProtocols.length > 0) {
-      const countryInfo = lookupCountry(detectedIp || raw.host);
+      const countryInfo = raw.countryHint
+        ? lookupCountryByName(raw.countryHint)
+        : lookupCountry(detectedIp || raw.host);
       const blacklists = this.blacklistManager.check(raw.host);
 
       const resultItem: ProxyResultItem = {

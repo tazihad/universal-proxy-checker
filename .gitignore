@@ -5,3 +5,6 @@ dist-electron
 .DS_Store
 .vscode
 .idea
+AppDir/
+electron/
+release/

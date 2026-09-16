@@ -1,8 +1,8 @@
 {
   "name": "universal-proxy-checker",
-  "version": "0.1.0",
+  "version": "0.2.1",
   "description": "Modern, high-performance, multithreaded proxy verification software supporting raw proxies and live proxy list subscription URLs.",
-  "main": "dist/index.html",
+  "main": "electron/main.cjs",
   "type": "module",
   "author": {
     "name": "tazihad",
@@ -19,7 +19,47 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "dist": "npm run build && electron-builder --linux AppImage --win portable zip"
+  },
+  "build": {
+    "appId": "com.tazihad.universal-proxy-checker",
+    "productName": "Universal-Proxy-Checker",
+    "icon": "dist/icons/icon.png",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "files",
+        "to": "files",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "linux": {
+      "target": "AppImage",
+      "category": "Network",
+      "icon": "dist/icons/icon.png",
+      "artifactName": "Universal-Proxy-Checker-${version}.${ext}",
+      "executableArgs": [
+        "--no-sandbox"
+      ]
+    },
+    "win": {
+      "target": [
+        "portable",
+        "zip"
+      ],
+      "icon": "dist/icons/icon.ico",
+      "artifactName": "Universal-Proxy-Checker-${version}.${ext}"
+    }
   },
   "dependencies": {
     "clsx": "^2.1.1",
@@ -34,6 +74,8 @@
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
     "@vitejs/plugin-react": "^4.3.4",
+    "electron": "^43.2.0",
+    "electron-builder": "^26.15.3",
     "tailwindcss": "^4.0.7",
     "typescript": "^5.7.3",
     "vite": "^6.1.0"

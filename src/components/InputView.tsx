@@ -134,7 +134,7 @@ export const InputView: React.FC<InputViewProps> = ({
             <span>Manual Proxy Input & List URLs</span>
           </label>
           <span className="text-[10px] text-slate-500 dark:text-zinc-500 font-mono">
-            Supports raw proxies or http/https links containing proxy lists
+            Supports: IP:Port, IP:Port:Country, IP:Port:User:Pass, URLs with proxy lists
           </span>
         </div>
 
@@ -142,7 +142,7 @@ export const InputView: React.FC<InputViewProps> = ({
           rows={5}
           value={manualText}
           onChange={e => setManualText(e.target.value)}
-          placeholder="Paste raw proxies (e.g. 1.2.3.4:8080) or links full of proxies (e.g. https://raw.githubusercontent.com/.../proxies.txt)..."
+          placeholder={"Paste proxies in any format:\n  1.2.3.4:8080\n  1.2.3.4:8080:Singapore\n  1.2.3.4:8080:user:pass\n  1.2.3.4:8080:user:pass:Singapore\nor paste links full of proxies (e.g. https://raw.githubusercontent.com/.../proxies.txt)..."}
           className="w-full bg-slate-50 dark:bg-zinc-950 border border-slate-300 dark:border-zinc-800 rounded-lg p-3 text-xs font-mono text-slate-900 dark:text-zinc-200 placeholder-slate-400 dark:placeholder-zinc-600 focus:outline-none focus:border-indigo-500/50 resize-y"
         />
 

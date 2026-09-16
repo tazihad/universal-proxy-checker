@@ -6,6 +6,7 @@ export interface RawProxy {
   port: number;
   auth: string; // 'none' or 'user:pass'
   type: string;
+  countryHint?: string; // Optional country name hint parsed from formats like IP:PORT:Country
 }
 
 export interface ProxyInspectionData {
